@@ -27,11 +27,11 @@ export default function LineGraph({ rows }: { rows: Transaction[] }) {
     const data = Object.values(monthly);
 
     return (
-        <div className=" rounded border border-slate-700 p-4 h-80">
-            <h3 className="text-lg text-black font-medium mb-4">Monthly Overview</h3>
-            <ResponsiveContainer width="100%" height="100%">
+        <div className=" rounded border border-white p-4 h-[40vh]">
+            <h3 className="text-lg text-black font- mb-4">Monthly Overview</h3>
+            <ResponsiveContainer >
                 <LineChart data={data}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#763abc" />
+                    <CartesianGrid strokeDasharray="2 2" stroke="#763abc" />
                     <XAxis dataKey="month" stroke="#fff" />
                     <YAxis stroke="#fff" />
                     <Tooltip />

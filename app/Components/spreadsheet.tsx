@@ -189,7 +189,7 @@ export default function Spreadsheet({
     );
 }
 
-// // components/spreadsheet.tsx
+// components/spreadsheet.tsx
 // 'use client';
 // import React, { useMemo, useState } from 'react';
 // import type { Transaction } from '@/types';
