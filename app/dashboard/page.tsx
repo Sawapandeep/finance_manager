@@ -78,12 +78,12 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Graph */}
-                <div className="bg-[#111] rounded-xl border border-white mx-auto shadow p-4">
+                <div className="bg-[#111] rounded-xl border border-white shadow p-4">
                     <LineGraph rows={rows} />
                 </div>
 
                 {/* Table + Upload */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
                     <div className="lg:col-span-2 bg-[#111] rounded-xl border border-slate-800 shadow p-4">
                         <Spreadsheet rows={rows} setRows={setRows} uid={uid} />
                     </div>
