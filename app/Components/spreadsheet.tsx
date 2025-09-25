@@ -132,8 +132,8 @@ export default function Spreadsheet({
                                                 })
                                             }
                                             className={`w-28 bg-slate-900 text-slate-100 rounded px-2 py-1 border border-slate-700 text-right appearance-none ${(row.amount ?? 0) < 0
-                                                    ? 'text-rose-400'
-                                                    : 'text-emerald-300'
+                                                ? 'text-rose-400'
+                                                : 'text-emerald-300'
                                                 }`}
                                         />
                                     </td>
@@ -230,13 +230,13 @@ export default function Spreadsheet({
                                         Savings: ₹ {totalSavings.toLocaleString()}
                                     </td>
                                 </tr>
-                                <tr className="bg-slate-900 font-medium">
+                                {/* <tr className="bg-slate-900 font-medium">
                                     <td className="px-2 py-2">After Gurudwara</td>
                                     <td className="px-2 py-2 font-mono">
                                         ₹ {afterGurudwaraTotal.toLocaleString()}
                                     </td>
                                     <td colSpan={4}></td>
-                                </tr>
+                                </tr> */}
                                 <tr className="bg-slate-900 font-semibold text-emerald-300">
                                     <td className="px-2 py-2">Spendable</td>
                                     <td className="px-2 py-2 font-mono">
