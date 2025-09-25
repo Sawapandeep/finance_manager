@@ -104,7 +104,7 @@ function Card({ title, value, color }: { title: string; value: string; color: st
         orange: "text-orange-400",
     };
     return (
-        <div className="bg-[#111] rounded-xl border border-slate-800 shadow p-4">
+        <div className="bg-[#111] rounded-xl border border-gray-800 shadow p-4">
             <div className="text-sm text-slate-400">{title}</div>
             <div className={`text-2xl font-bold mt-1 ${colorMap[color]}`}>{value}</div>
         </div>

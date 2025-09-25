@@ -157,13 +157,14 @@ export default function Spreadsheet({
                                         value={row.inOut}
                                         onChange={(e) =>
                                             updateRow(row.id, {
-                                                inOut: e.target.value as 'COME' | 'GO',
+                                                inOut: e.target.value as 'GO' | 'COME',
                                             })
                                         }
                                         className="bg-slate-900 text-slate-100 rounded px-2 py-1 border border-slate-700 w-full"
                                     >
-                                        <option value="COME" className='bg-green-500'>COME</option>
                                         <option value="GO" className='bg-red-500'>GO</option>
+                                        <option value="COME" className='bg-green-500'>COME</option>
+
                                     </select>
                                 </td>
 
@@ -193,7 +194,7 @@ export default function Spreadsheet({
                                 </td>
 
                                 {/* Actions */}
-                                <td className="px-2 py-2">
+                                <th className="px-2 py-2 w-28">
                                     <div className="flex gap-2">
                                         <button
                                             onClick={() => {
@@ -202,35 +203,38 @@ export default function Spreadsheet({
                                                 );
                                                 alert('Copied row JSON');
                                             }}
-                                            className="px-2 py-1 bg-slate-700 rounded text-slate-200 text-xs"
+                                            className="px-2 py-1 bg-slate-700 rounded text-slate-300 text-xs"
                                         >
                                             Copy
                                         </button>
                                         <button
                                             onClick={() => deleteRow(row.id)}
-                                            className="px-2 py-1 bg-rose-600 rounded text-white text-xs"
+                                            className="px-2 py-1  bg-rose-600 rounded text-white text-xs"
                                         >
                                             Delete
                                         </button>
                                     </div>
-                                </td>
+                                </th>
                             </tr>
                         ))}
 
-                        <tr className="flex flex-row justify-end">
-                            <button
-                                onClick={addEmptyRow}
-                                className="px-3 py-1 bg-slate-700 rounded text-slate-100"
-                            >
-                                + Add row
-                            </button>
-                            <button
-                                onClick={exportCSV}
-                                className="px-3 py-1 bg-blue rounded text-white"
-                            >
-                                Export CSV
-                            </button>
+                        <tr>
+                            <td colSpan={5} className="px-2 py-2 text-right font-semibold space-x-2">
+                                <button
+                                    onClick={addEmptyRow}
+                                    className="px-3 py-1 bg-slate-700 rounded text-slate-100"
+                                >
+                                    + Add row
+                                </button>
+                                <button
+                                    onClick={exportCSV}
+                                    className="px-3 py-1 bg-blue-600 rounded text-white"
+                                >
+                                    Export CSV
+                                </button>
+                            </td>
                         </tr>
+
                         {/* Totals */}
                         <tr className="bg-slate-900 font-medium">
                             <td className="px-2 py-2">Totals</td>

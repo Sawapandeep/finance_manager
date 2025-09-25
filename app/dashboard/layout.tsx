@@ -1,24 +1,20 @@
-// app/dashboard/layout.tsx
+
+
+// app / dashboard / layout.tsx
 'use client';
 import React from "react";
+import { Poppins } from "next/font/google";
 import { User } from "firebase/auth";
-
+const PoppinSans = Poppins({
+    variable: "--font-poppins",
+    subsets: ["latin"],
+    weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+});
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     return (
-        <div className="flex min-h-screen bg-[#0a0a0a] text-slate-100">
-            {/* Sidebar */}
-            {/* <aside className="w-60 bg-[#111] border-r border-slate-800 p-4 flex flex-col">
-                <h1 className="text-xl font-bold text-emerald-500 mb-6">FinancePro</h1>
-                <nav className="space-y-2 text-sm">
-                    <a className="block px-3 py-2 rounded hover:bg-slate-800 cursor-pointer">Dashboard</a>
-                    <a className="block px-3 py-2 rounded hover:bg-slate-800 cursor-pointer">Transactions</a>
-                    <a className="block px-3 py-2 rounded hover:bg-slate-800 cursor-pointer">Reports</a>
-                    <a className="block px-3 py-2 rounded hover:bg-slate-800 cursor-pointer">Settings</a>
-                </nav>
-            </aside> */}
+        <div className="  ">
 
-            {/* Main */}
-            <main className="flex-1 p-6 overflow-auto">{children}</main>
+            <main className={`${PoppinSans.variable} flex-1  overflow-auto`}>{children}</main>
         </div>
     );
 }

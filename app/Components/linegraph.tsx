@@ -28,7 +28,7 @@ export default function LineGraph({ rows }: { rows: Transaction[] }) {
 
     return (
         <div className=" rounded border border-white p-4 h-[40vh]">
-            <h3 className="text-lg text-black font- mb-4">Monthly Overview</h3>
+            <h3 className="text-semibold text-white font-medium mb-4">Monthly Overview</h3>
             <ResponsiveContainer >
                 <LineChart data={data}>
                     <CartesianGrid strokeDasharray="2 2" stroke="#763abc" />
