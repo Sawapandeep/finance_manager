@@ -6,6 +6,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { isAllowedUser } from "@/lib/auth";
 import GoogleSignInButton from "./Components/GoogleSignInButton";
+import { BackgroundLines } from "./Components/ui/background-lines";
 export default function HomePage() {
   const router = useRouter();
 
@@ -19,10 +20,13 @@ export default function HomePage() {
   }, [router]);
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <h1 className="mb-4 text-2xl font-bold">Welcome</h1>
-      <GoogleSignInButton />
-    </div>
+    <BackgroundLines className="flex  justify-center w-full  px-4">
+      <div className="flex flex-col items-center justify-center ">
+        <h1 className="mb-4 text-2xl font-bold">Welcome</h1>
+        <p className="mb-4 text-2xl  text-center font-bold">This is an invite only website. <br /> Please sign in to request access.</p>
+        <GoogleSignInButton />
+      </div></BackgroundLines>
+
   );
 }
 

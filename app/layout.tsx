@@ -1,5 +1,5 @@
 import '@/app/globals.css';
-
+import AutoLogoutProvider from '@/app/Components/AutoLogoutProvider';
 export const metadata = {
   title: 'Finance Manager',
   description: 'Simple monthly budget manager',
@@ -8,7 +8,7 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" >
-      <body className="">{children}</body>
+      <body className=""><AutoLogoutProvider>{children}</AutoLogoutProvider></body>
     </html>
   );
 }

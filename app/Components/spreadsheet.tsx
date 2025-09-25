@@ -83,7 +83,7 @@ export default function Spreadsheet({
     }, 0);
 
     const totalSavings = rows.reduce((s, r) => s + (r.savings || 0), 0);
-    const gurudwaraTotal = 11157;
+    const gurudwaraTotal = 0;
     const afterGurudwaraTotal = total - gurudwaraTotal;
     const spendable = afterGurudwaraTotal - totalSavings;
 
@@ -94,7 +94,7 @@ export default function Spreadsheet({
             </div>
 
             <div className="overflow-auto">
-                <table className="min-w-full table-auto text-sm">
+                <table className=" table-auto text-sm">
                     <thead>
                         <tr className="text-left text-slate-300 border-b border-slate-700">
                             <th className="px-2 py-2 w-28">Date</th>
@@ -146,10 +146,10 @@ export default function Spreadsheet({
                                                 inOut: e.target.value as 'GO' | 'COME',
                                             })
                                         }
-                                        className="bg-slate-900 text-slate-100 rounded px-2 py-1 border border-slate-700 w-full"
+                                        className="bg-slate-900 text-slate-100 rounded px-2 py-1 border border-black md:w-full"
                                     >
-                                        <option value="GO" className="bg-red-500 text-white">GO</option>
-                                        <option value="COME" className="bg-green-500 text-white">COME</option>
+                                        <option value="GO" className="bg-red-500 text-slate-100">GO</option>
+                                        <option value="COME" className="bg-green-500 text-slate-100">COME</option>
                                     </select>
                                 </td>
 
@@ -160,7 +160,7 @@ export default function Spreadsheet({
                                         onChange={(e) =>
                                             updateRow(row.id, { type: e.target.value })
                                         }
-                                        className="bg-slate-900 text-slate-100 rounded px-2 py-1 border border-slate-700 w-full"
+                                        className="bg-slate-900 text-slate-100 rounded px-2 py-1 border border-slate-700 md:w-full "
                                     />
                                 </td>
 
@@ -174,27 +174,27 @@ export default function Spreadsheet({
                                                 savings: Number(e.target.value) || 0,
                                             })
                                         }
-                                        className="bg-slate-900 text-slate-100 rounded px-2 py-1 border border-slate-700 w-full"
+                                        className="bg-slate-900 text-slate-100 rounded px-2 py-1 border border-slate-700 md:w-ful appearance-none"
                                     />
                                 </td>
 
                                 {/* Actions */}
                                 <td className="px-2 py-2 w-28">
-                                    <div className="flex gap-2">
-                                        <button
+                                    <div className="flex ">
+                                        {/* <button
                                             onClick={() => {
                                                 navigator.clipboard?.writeText(
                                                     JSON.stringify(row)
                                                 );
                                                 alert('Copied row JSON');
                                             }}
-                                            className="px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-slate-100 text-xs"
+                                            className="px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-100 "
                                         >
                                             Copy
-                                        </button>
+                                        </button> */}
                                         <button
                                             onClick={() => deleteRow(row.id)}
-                                            className="px-2 py-1 bg-rose-600 hover:bg-rose-700 rounded text-white text-xs"
+                                            className="px-2 py-1 bg-red-600 hover:bg-rose-700 rounded-lg text-white "
                                         >
                                             Delete
                                         </button>

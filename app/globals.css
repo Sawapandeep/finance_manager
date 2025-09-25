@@ -1,9 +1,11 @@
 @import "tailwindcss/preflight";
-
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 /* custom */
 
 body {
-    @apply  text-slate-100;
+    /* @apply  text-slate-100; */
 
 }
 
@@ -44,4 +46,26 @@ body {
 
 .animate-fadeIn {
   animation: fadeIn 0.4s ease-out;
+}
+
+/* button, input, select, optgroup, textarea {
+  font: inherit;
+  font-feature-settings: inherit;
+  font-variation-settings: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  opacity: 1;
+  /* background-color: rgba(0, 0, 0, 0); 
+  border-radius: 2px;
+} */
+
+/* Remove number input arrows */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
 }
