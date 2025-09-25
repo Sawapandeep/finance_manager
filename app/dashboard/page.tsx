@@ -86,7 +86,7 @@ export default function DashboardPage() {
                 {/* Top summary cards */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                     <Card title="Net Total" value={`₹ ${total.toLocaleString()}`} color="blue" />
-                    <Card title="After Gurudwara" value={`₹ ${afterGurudwaraTotal.toLocaleString()}`} color="purple" />
+                    {/* <Card title="After Gurudwara" value={`₹ ${afterGurudwaraTotal.toLocaleString()}`} color="purple" /> */}
                     <Card title="Savings" value={`₹ ${totalSavings.toLocaleString()}`} color="green" />
                     <Card title="Spendable" value={`₹ ${spendable.toLocaleString()}`} color="orange" />
                 </div>
