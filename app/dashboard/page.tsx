@@ -14,6 +14,8 @@ import UploadPaste from "@/app/Components/uploadPaste";
 export default function DashboardPage() {
     const [rows, setRows] = useState<Transaction[]>([]);
     const [uid, setUid] = useState<string | null>(null);
+    const [userName, setUserName] = useState<string | null>(null);
+    const [userEmail, setUserEmail] = useState<string | null>(null);
 
     useEffect(() => {
         let unsubscribe: (() => void) | undefined;
@@ -21,6 +23,8 @@ export default function DashboardPage() {
         const unsubAuth = onAuthStateChanged(auth, (user) => {
             if (user) {
                 setUid(user.uid);
+                setUserName(user.displayName || "User");
+                setUserEmail(user.email || "");
 
                 const q = query(
                     collection(db, "users", user.uid, "transactions"),
@@ -37,6 +41,8 @@ export default function DashboardPage() {
             } else {
                 setRows([]);
                 setUid(null);
+                setUserName(null);
+                setUserEmail(null);
             }
         });
 
@@ -68,9 +74,17 @@ export default function DashboardPage() {
 
     return (
         <AuthGate>
-            <div className="space-y-8">
+            <div className="space-y-10 animate-fadeIn">
+                {/* Username Header */}
+                <div className="flex justify-between items-center">
+                    <h1 className="text-2xl font-bold text-slate-100">
+                        {userName ? `${userName}'s Dashboard` : "Dashboard"}
+                    </h1>
+                    <p className="text-slate-400 text-sm">{userEmail}</p>
+                </div>
+
                 {/* Top summary cards */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                     <Card title="Net Total" value={`₹ ${total.toLocaleString()}`} color="blue" />
                     <Card title="After Gurudwara" value={`₹ ${afterGurudwaraTotal.toLocaleString()}`} color="purple" />
                     <Card title="Savings" value={`₹ ${totalSavings.toLocaleString()}`} color="green" />
@@ -78,18 +92,14 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Graph */}
-                <div className="bg-[#111] rounded-xl border border-white shadow p-4">
-                    <LineGraph rows={rows} />
-                </div>
+                <LineGraph rows={rows} />
 
                 {/* Table + Upload */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-                    <div className="lg:col-span-2 bg-[#111] rounded-xl border border-slate-800 shadow p-4">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-6">
+                    <div className="lg:col-span-2">
                         <Spreadsheet rows={rows} setRows={setRows} uid={uid} />
                     </div>
-                    <div className="bg-[#111] rounded-xl border border-slate-800 shadow p-4">
-                        <UploadPaste onImport={handleImport} />
-                    </div>
+                    <UploadPaste onImport={handleImport} />
                 </div>
             </div>
         </AuthGate>
@@ -104,7 +114,7 @@ function Card({ title, value, color }: { title: string; value: string; color: st
         orange: "text-orange-400",
     };
     return (
-        <div className="bg-[#111] rounded-xl border border-gray-800 shadow p-4">
+        <div className="rounded-xl border border-slate-800 bg-[#0f0f0f] p-6 shadow-lg hover:shadow-xl transition-all">
             <div className="text-sm text-slate-400">{title}</div>
             <div className={`text-2xl font-bold mt-1 ${colorMap[color]}`}>{value}</div>
         </div>

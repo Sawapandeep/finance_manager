@@ -1,10 +1,10 @@
-/** @type {import('tailwindcss').Config} */
+// tailwind.config.js
 module.exports = {
   content: [
-    "./app/**/*.{ts,tsx,js,jsx}",
-    "./components/**/*.{ts,tsx,js,jsx}",
+    "./app/**/*.{js,ts,jsx,tsx}",  // if you use Next.js app router
+    "./pages/**/*.{js,ts,jsx,tsx}", // if you use pages router
+    "./components/**/*.{js,ts,jsx,tsx}", 
   ],
-  darkMode: 'class',
   theme: {
     extend: {},
   },
