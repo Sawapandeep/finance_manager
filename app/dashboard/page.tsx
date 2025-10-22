@@ -11,12 +11,14 @@ import Spreadsheet from "@/app/Components/spreadsheet";
 import LineGraph from "@/app/Components/linegraph";
 import UploadPaste from "@/app/Components/uploadPaste";
 import { useRouter } from "next/navigation";
+import CustomCards from "@/app/Components/CustomCards";
 
 export default function DashboardPage() {
     const [rows, setRows] = useState<Transaction[]>([]);
     const [uid, setUid] = useState<string | null>(null);
     const [userName, setUserName] = useState<string | null>(null);
     const [userEmail, setUserEmail] = useState<string | null>(null);
+    const [customTotal, setCustomTotal] = useState(0);
     const router = useRouter();
 
     useEffect(() => {
@@ -79,6 +81,7 @@ export default function DashboardPage() {
     const gurudwaraTotal = 0;
     const afterGurudwaraTotal = total - gurudwaraTotal;
     const spendable = afterGurudwaraTotal - totalSavings;
+    const spendableAfterCustom = spendable - customTotal;
 
     return (
         <AuthGate>
@@ -102,20 +105,20 @@ export default function DashboardPage() {
                 {/* Top summary cards */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                     <Card title="Net Total" value={`₹ ${total.toLocaleString()}`} color="blue" />
-                    {/* <Card title="After Gurudwara" value={`₹ ${afterGurudwaraTotal.toLocaleString()}`} color="purple" /> */}
                     <Card title="Savings" value={`₹ ${totalSavings.toLocaleString()}`} color="green" />
                     <Card title="Spendable" value={`₹ ${spendable.toLocaleString()}`} color="orange" />
                 </div>
-
+                <CustomCards onTotalChange={setCustomTotal} />
                 {/* Graph */}
                 <LineGraph rows={rows} />
 
                 {/* Table + Upload */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-6">
-                    <div className="lg:col-span-2">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6 ">
+                    <div className="lg:col-span-2 gap-y-6 flex flex-col">
                         <Spreadsheet rows={rows} setRows={setRows} uid={uid} />
+                        <UploadPaste onImport={handleImport} />
                     </div>
-                    <UploadPaste onImport={handleImport} />
+
                 </div>
             </div>
         </AuthGate>

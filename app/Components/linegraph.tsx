@@ -26,29 +26,6 @@ export default function LineGraph({ rows }: { rows: Transaction[] }) {
 
     const data = Object.values(monthly);
 
-    // return (
-    //     <div className=" rounded border border-white p-4 h-[40vh]">
-    //         <h3 className="text-semibold text-white font-medium mb-4">Monthly Overview</h3>
-    //         <ResponsiveContainer >
-    //             <LineChart data={data}>
-    //                 <CartesianGrid strokeDasharray="2 2" stroke="#763abc" />
-    //                 <XAxis dataKey="month" stroke="#fff" />
-    //                 <YAxis stroke="#fff" />
-    //                 <Tooltip />
-    //                 <Legend />
-
-    //                 {/* Blue line = Net Total */}
-    //                 <Line type="monotone" dataKey="total" stroke="#3b82f6" name="Net Total" dot={false} />
-
-    //                 {/* Green line = Savings */}
-    //                 <Line type="monotone" dataKey="savings" stroke="#22c55e" name="Savings" dot={false} />
-
-    //                 {/* Red line = Expenses */}
-    //                 <Line type="monotone" dataKey="expenses" stroke="#ef4444" name="Expenses" dot={false} />
-    //             </LineChart>
-    //         </ResponsiveContainer>
-    //     </div>
-    // );
     return (
         <div className="rounded-xl border border-slate-800 bg-[#0f0f0f] p-6 shadow-lg animate-fadeIn">
             <h3 className="text-xl font-semibold text-slate-200 mb-2">Monthly Overview</h3>

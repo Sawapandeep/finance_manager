@@ -16,8 +16,9 @@ export default function AutoLogoutProvider({ children }: { children: React.React
             timeout = setTimeout(async () => {
                 await signOut(auth);
                 router.push("/");
-            }, 180_000); // 3 minutes = 180,000 ms
+            }, 2_400_000); // ✅ 40 minutes = 2,400,000 ms
         };
+
 
         // List of events that count as "activity"
         const events = ["mousemove", "keydown", "mousedown", "touchstart"];

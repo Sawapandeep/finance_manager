@@ -45,6 +45,58 @@ export async function deleteTransaction(uid: string, id: string) {
   await deleteDoc(ref);
 }
 
+// -------------------------------------------------------------
+// 🧾 CUSTOM EXPENSES (user-specific modular cards)
+// -------------------------------------------------------------
+
+export interface CustomExpense {
+  id?: string;
+  title: string;
+  amount: number;
+  color?: string;
+  createdAt?: Date;
+}
+
+// ✅ Fetch all custom expenses for a user
+export async function fetchCustomExpenses(uid: string): Promise<CustomExpense[]> {
+  const q = query(
+    collection(db, "users", uid, "customExpenses"),
+    orderBy("createdAt", "asc")
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() } as CustomExpense));
+}
+
+// ✅ Add a new custom expense card
+export async function addCustomExpense(
+  uid: string,
+  data: Omit<CustomExpense, "id">
+): Promise<string> {
+  const ref = collection(db, "users", uid, "customExpenses");
+  const docRef = await addDoc(ref, {
+    ...data,
+    createdAt: new Date(),
+  });
+  return docRef.id;
+}
+
+// ✅ Update a custom expense card
+export async function updateCustomExpense(
+  uid: string,
+  id: string,
+  patch: Partial<CustomExpense>
+) {
+  const ref = doc(db, "users", uid, "customExpenses", id);
+  await updateDoc(ref, patch);
+}
+
+// ✅ Delete a custom expense card
+export async function deleteCustomExpense(uid: string, id: string) {
+  const ref = doc(db, "users", uid, "customExpenses", id);
+  await deleteDoc(ref);
+}
+
+
 // // lib/firestore.ts
 // import {
 //   collection,
