@@ -73,18 +73,18 @@ export default function CustomCards({
                     placeholder="Card title (e.g., Rent)"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="border px-3 py-2 rounded-md bg-[#121212] text-white"
+                    className="border-2  border-slate-700 px-3 py-2 rounded-md bg-[#121212] text-white"
                 />
                 <input
                     type="number"
                     placeholder="Amount"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
-                    className="border px-3 py-2 rounded-md bg-[#121212] text-white w-28"
+                    className="border-2  border-slate-700 px-3 py-2 rounded-md bg-[#121212] text-white w-28"
                 />
                 <button
                     onClick={handleAddCard}
-                    className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+                    className="bg-blue-800 text-white px-4 py-2 rounded-md hover:bg-blue-600"
                 >
                     Add
                 </button>

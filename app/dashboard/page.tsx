@@ -77,12 +77,39 @@ export default function DashboardPage() {
     }
 
     // 💰 Core calculations
-    const total = rows.reduce((s, r) => (r.inOut === "COME" ? s + (r.amount || 0) : s - (r.amount || 0)), 0);
-    const totalSavings = rows.reduce((s, r) => s + (r.savings || 0), 0);
+    // const total = rows.reduce((s, r) => (r.inOut === "COME" ? s + (r.amount || 0) : s - (r.amount || 0)), 0);
+    // const totalSavings = rows.reduce((s, r) => s + (r.savings || 0), 0);
+    // const gurudwaraTotal = 0;
+    // const afterGurudwaraTotal = total - gurudwaraTotal;
+    // const spendable = afterGurudwaraTotal - totalSavings;
+    // const spendableAfterCustom = Math.max(spendable - customTotal, 0); // ✅ never negative
+
+    // 💰 Core calculations — unified with spreadsheet.tsx
+
+    // ✅ NET TOTAL
+    const total = rows.reduce((s, r) => {
+        if (r.inOut === "COME") return s + (r.amount || 0);
+        if (r.inOut === "GO") return s - (r.amount || 0);
+        if (r.inOut === "SAVINGS-DEBIT") return s - (r.amount || 0); // ✅ withdraw from savings
+        return s;
+    }, 0);
+
+    // ✅ TOTAL SAVINGS
+    const totalSavings = rows.reduce((s, r) => {
+        // Normal savings added monthly
+        if (r.inOut === "COME" || r.inOut === "GO") return s + (r.savings || 0);
+
+        // ✅ SAVINGS-DEBIT means money pulled out from savings (e.g. FD withdrawal)
+        if (r.inOut === "SAVINGS-DEBIT") return s - (r.amount || 0);
+
+        return s;
+    }, 0);
+
+    // ✅ SPENDABLE CALCULATION
     const gurudwaraTotal = 0;
     const afterGurudwaraTotal = total - gurudwaraTotal;
     const spendable = afterGurudwaraTotal - totalSavings;
-    const spendableAfterCustom = Math.max(spendable - customTotal, 0); // ✅ never negative
+    const spendableAfterCustom = Math.max(spendable - customTotal, 0); // never negative
 
     return (
         <AuthGate>

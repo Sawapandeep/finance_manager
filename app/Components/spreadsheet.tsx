@@ -145,15 +145,52 @@ export default function Spreadsheet({
     }
 
     // Totals
+    // const total = rows.reduce((s, r) => {
+    //     if (r.inOut === 'COME') return s + (r.amount || 0);
+    //     if (r.inOut === 'GO') return s - (r.amount || 0);
+    //     return s;
+    // }, 0);
+    // const total = rows.reduce((s, r) => {
+    //     if (r.inOut === 'COME') return s + (r.amount || 0);
+    //     if (r.inOut === 'GO') return s - (r.amount || 0);
+    //     if (r.inOut === 'SAVINGS-DEBIT') return s - (r.amount || 0); // ✅ FD or other transfers out
+    //     return s;
+    // }, 0);
+
+
+    // // const totalSavings = rows.reduce((s, r) => s + (r.savings || 0), 0);
+    // const totalSavings = rows.reduce((s, r) => {
+    //     if (r.inOut === 'SAVINGS-DEBIT') return s + (r.amount || 0); // ✅ Add to savings
+    //     return s + (r.savings || 0);
+    // }, 0);
+
+    // const afterGurudwaraTotal = total;
+    // const spendable = afterGurudwaraTotal - totalSavings;
+
+
+    // ✅ NET TOTAL
     const total = rows.reduce((s, r) => {
         if (r.inOut === 'COME') return s + (r.amount || 0);
         if (r.inOut === 'GO') return s - (r.amount || 0);
+        if (r.inOut === 'SAVINGS-DEBIT') return s - (r.amount || 0); // ✅ Withdraw from net
         return s;
     }, 0);
 
-    const totalSavings = rows.reduce((s, r) => s + (r.savings || 0), 0);
+    // ✅ TOTAL SAVINGS
+    const totalSavings = rows.reduce((s, r) => {
+        // Normal savings added monthly
+        if (r.inOut === 'COME' || r.inOut === 'GO') return s + (r.savings || 0);
+
+        // ✅ SAVINGS-DEBIT means money pulled out from savings (e.g. FD withdrawal)
+        if (r.inOut === 'SAVINGS-DEBIT') return s - (r.amount || 0);
+
+        return s;
+    }, 0);
+
+    // ✅ SPENDABLE CALCULATION
     const afterGurudwaraTotal = total;
     const spendable = afterGurudwaraTotal - totalSavings;
+
 
     return (
         <div className="relative">
@@ -281,6 +318,7 @@ export default function Spreadsheet({
                                                 >
                                                     <option value="GO">DEBIT</option>
                                                     <option value="COME">CREDIT</option>
+                                                    <option value="SAVINGS-DEBIT">SAVINGS-DEBIT</option>
                                                 </select>
                                             </td>
 
