@@ -64,28 +64,56 @@ export default function Spreadsheet({
     }
 
     // Save row after editing (validation)
+    // async function saveRow(row: Transaction) {
+    //     if (!uid) return;
+
+    //     // Validate required fields
+    //     if (!row.date || row.amount === undefined || row.inOut === 'COME' || row.savings === undefined) {
+    //         setErrorMsg('Please fill in all required fields (Date, Amount, In/Out, Savings).');
+    //         setTimeout(() => setErrorMsg(null), 3000);
+    //         return;
+    //     }
+
+    //     if (row.id.startsWith('temp-')) {
+    //         const newRow = { ...row };
+    //         const docId = await addTransaction(uid, newRow);
+    //         newRow.id = docId;
+    //         setRows(rows.map((r) => (r.id === row.id ? newRow : r)));
+    //     } else {
+    //         await updateTransaction(uid, row.id, row);
+    //     }
+
+    //     setEditingId(null);
+    //     setErrorMsg(null);
+    // }
     async function saveRow(row: Transaction) {
         if (!uid) return;
 
-        // Validate required fields
-        if (!row.date || row.amount === undefined || row.inOut === 'COME' || row.savings === undefined) {
+        // ✅ Proper validation
+        if (!row.date || row.amount === undefined || !row.inOut || row.savings === undefined) {
             setErrorMsg('Please fill in all required fields (Date, Amount, In/Out, Savings).');
             setTimeout(() => setErrorMsg(null), 3000);
             return;
         }
 
-        if (row.id.startsWith('temp-')) {
-            const newRow = { ...row };
-            const docId = await addTransaction(uid, newRow);
-            newRow.id = docId;
-            setRows(rows.map((r) => (r.id === row.id ? newRow : r)));
-        } else {
-            await updateTransaction(uid, row.id, row);
+        try {
+            if (row.id.startsWith('temp-')) {
+                const newRow = { ...row };
+                const docId = await addTransaction(uid, newRow);
+                newRow.id = docId;
+                setRows(rows.map((r) => (r.id === row.id ? newRow : r)));
+            } else {
+                await updateTransaction(uid, row.id, row);
+            }
+            setEditingId(null);
+            setErrorMsg(null);
+        } catch (err) {
+            console.error('Error saving row:', err);
+            setErrorMsg('Failed to save transaction.');
+            setTimeout(() => setErrorMsg(null), 3000);
         }
-
-        setEditingId(null);
-        setErrorMsg(null);
     }
+
 
     // Delete row after confirmation
     async function confirmDeleteRow() {
