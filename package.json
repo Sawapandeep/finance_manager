@@ -15,7 +15,7 @@
     "file-saver": "^2.0.5",
     "firebase": "^12.3.0",
     "motion": "^12.23.22",
-    "next": "15.5.3",
+    "next": "^16.2.11",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "recharts": "^3.2.1",
