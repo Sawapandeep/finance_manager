@@ -1,119 +1,128 @@
+// @/app/Components/CustomCards.tsx
 'use client';
 
 import { useEffect, useState } from "react";
 import { auth } from "@/lib/firebase";
-import {
-    fetchCustomExpenses,
-    addCustomExpense,
-    deleteCustomExpense,
-    CustomExpense,
-} from "@/lib/firestore";
+import { fetchCustomExpenses, addCustomExpense, deleteCustomExpense, CustomExpense } from "@/lib/firestore";
 
 export default function CustomCards({
-    onTotalChange,
-    spendable,
+  onTotalChange,
+  spendable,
 }: {
-    onTotalChange: (total: number) => void;
-    spendable: number;
+  onTotalChange: (total: number) => void;
+  spendable: number;
 }) {
-    const [customCards, setCustomCards] = useState<CustomExpense[]>([]);
-    const [title, setTitle] = useState("");
-    const [amount, setAmount] = useState<number | string>("");
-    const [color, setColor] = useState("purple");
-    const [error, setError] = useState<string | null>(null);
+  const [customCards, setCustomCards] = useState<CustomExpense[]>([]);
+  const [title, setTitle] = useState("");
+  const [amount, setAmount] = useState<number | string>("");
+  const [error, setError] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
 
-    // 🟢 Load user’s saved cards
-    useEffect(() => {
-        const uid = auth.currentUser?.uid;
-        if (!uid) return;
+  useEffect(() => {
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
+    fetchCustomExpenses(uid).then((data) => {
+      setCustomCards(data);
+      onTotalChange(data.reduce((sum, c) => sum + c.amount, 0));
+    });
+  }, []);
 
-        fetchCustomExpenses(uid).then((data) => {
-            setCustomCards(data);
-            onTotalChange(data.reduce((sum, c) => sum + c.amount, 0));
-        });
-    }, []);
+  const handleAddCard = async () => {
+    const uid = auth.currentUser?.uid;
+    if (!uid || !title || !amount) return;
+    const amt = Number(amount);
+    const totalWithNew = customCards.reduce((sum, c) => sum + c.amount, 0) + amt;
+    if (totalWithNew > spendable) {
+      setError("That would exceed what's spendable.");
+      return;
+    }
+    const id = await addCustomExpense(uid, { title, amount: amt });
+    const newCards = [...customCards, { id, title, amount: amt }];
+    setCustomCards(newCards);
+    setTitle("");
+    setAmount("");
+    setError(null);
+    onTotalChange(newCards.reduce((sum, c) => sum + c.amount, 0));
+  };
 
-    // 🟡 Add new card
-    const handleAddCard = async () => {
-        const uid = auth.currentUser?.uid;
-        if (!uid || !title || !amount) return;
-        const amt = Number(amount);
+  const handleDelete = async (id?: string) => {
+    const uid = auth.currentUser?.uid;
+    if (!uid || !id) return;
+    await deleteCustomExpense(uid, id);
+    const newCards = customCards.filter((c) => c.id !== id);
+    setCustomCards(newCards);
+    onTotalChange(newCards.reduce((sum, c) => sum + c.amount, 0));
+  };
 
-        const totalWithNew = customCards.reduce((sum, c) => sum + c.amount, 0) + amt;
-        if (totalWithNew > spendable) {
-            setError("Total custom card amount cannot exceed spendable balance.");
-            return;
-        }
+  return (
+    <div
+      className="rounded-2xl overflow-hidden"
+      style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+    >
+      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between p-4 sm:p-5">
+        <span className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>
+          Set-aside categories {customCards.length > 0 && `(${customCards.length})`}
+        </span>
+        <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{open ? '−' : '+'}</span>
+      </button>
 
-        const id = await addCustomExpense(uid, { title, amount: amt, color });
-        const newCards = [...customCards, { id, title, amount: amt, color }];
-        setCustomCards(newCards);
-        setTitle("");
-        setAmount("");
-        setError(null);
-        onTotalChange(newCards.reduce((sum, c) => sum + c.amount, 0));
-    };
+      {open && (
+        <div className="px-4 pb-4 sm:px-5 sm:pb-5 space-y-3">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="e.g. Rent"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="flex-1 text-sm rounded-lg px-3 py-2"
+              style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
+            />
+            <input
+              type="number"
+              placeholder="Amount"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="font-mono-nums w-24 text-sm rounded-lg px-3 py-2"
+              style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
+            />
+            <button
+              onClick={handleAddCard}
+              className="px-4 py-2 rounded-lg text-sm"
+              style={{ background: 'var(--savings)', color: '#0b0e14' }}
+            >
+              Add
+            </button>
+          </div>
+          {error && <p className="text-xs" style={{ color: 'var(--debit)' }}>{error}</p>}
 
-    // 🔴 Delete card
-    const handleDelete = async (id?: string) => {
-        const uid = auth.currentUser?.uid;
-        if (!uid || !id) return;
-        await deleteCustomExpense(uid, id);
-        const newCards = customCards.filter((c) => c.id !== id);
-        setCustomCards(newCards);
-        onTotalChange(newCards.reduce((sum, c) => sum + c.amount, 0));
-    };
-
-    return (
-        <div className="col-span-1 md:col-span-4 mt-2">
-            {/* Input Row */}
-            <div className="flex items-center gap-3 mb-3 flex-wrap">
-                <input
-                    type="text"
-                    placeholder="Card title (e.g., Rent)"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className="border-2  border-slate-700 px-3 py-2 rounded-md bg-[#121212] text-white"
-                />
-                <input
-                    type="number"
-                    placeholder="Amount"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    className="border-2  border-slate-700 px-3 py-2 rounded-md bg-[#121212] text-white w-28"
-                />
-                <button
-                    onClick={handleAddCard}
-                    className="bg-blue-800 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+          {customCards.length > 0 && (
+            <div className="grid grid-cols-2 gap-2">
+              {customCards.map((card) => (
+                <div
+                  key={card.id}
+                  className="rounded-xl p-3 relative"
+                  style={{ background: 'var(--surface-2)' }}
                 >
-                    Add
-                </button>
-                {error && <p className="text-red-400 text-sm">{error}</p>}
+                  <button
+                    onClick={() => handleDelete(card.id)}
+                    className="absolute top-2 right-2 text-xs"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
+                    ✕
+                  </button>
+                  <p className="text-xs mb-1" style={{ color: 'var(--text-muted)' }}>{card.title}</p>
+                  <p className="font-mono-nums text-sm font-medium">₹{card.amount.toLocaleString()}</p>
+                </div>
+              ))}
             </div>
-
-            {/* Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                {customCards.map((card) => (
-                    <div
-                        key={card.id}
-                        className={`rounded-xl p-4 text-white shadow-md relative border border-slate-800 bg-[#0f0f0f]`}
-                    >
-                        <button
-                            onClick={() => handleDelete(card.id)}
-                            className="absolute top-2 right-2 bg-white text-black rounded-full px-2 py-1 text-xs hover:bg-gray-200"
-                        >
-                            ✕
-                        </button>
-                        <h3 className="text-lg font-semibold text-purple-400">{card.title}</h3>
-                        <p className="text-2xl mt-2 font-bold">₹ {card.amount.toLocaleString()}</p>
-                    </div>
-                ))}
-            </div>
+          )}
         </div>
-    );
+      )}
+    </div>
+  );
 }
+// 'use client';
 
-// "use client";
 // import { useEffect, useState } from "react";
 // import { auth } from "@/lib/firebase";
 // import {
@@ -123,13 +132,20 @@ export default function CustomCards({
 //     CustomExpense,
 // } from "@/lib/firestore";
 
-// export default function CustomCards({ onTotalChange }: { onTotalChange: (total: number) => void }) {
+// export default function CustomCards({
+//     onTotalChange,
+//     spendable,
+// }: {
+//     onTotalChange: (total: number) => void;
+//     spendable: number;
+// }) {
 //     const [customCards, setCustomCards] = useState<CustomExpense[]>([]);
 //     const [title, setTitle] = useState("");
 //     const [amount, setAmount] = useState<number | string>("");
 //     const [color, setColor] = useState("purple");
+//     const [error, setError] = useState<string | null>(null);
 
-//     // 🟢 Load user’s cards
+//     // 🟢 Load user’s saved cards
 //     useEffect(() => {
 //         const uid = auth.currentUser?.uid;
 //         if (!uid) return;
@@ -140,20 +156,25 @@ export default function CustomCards({
 //         });
 //     }, []);
 
-//     // 🟡 Add card
+//     // 🟡 Add new card
 //     const handleAddCard = async () => {
 //         const uid = auth.currentUser?.uid;
 //         if (!uid || !title || !amount) return;
 //         const amt = Number(amount);
+
+//         const totalWithNew = customCards.reduce((sum, c) => sum + c.amount, 0) + amt;
+//         if (totalWithNew > spendable) {
+//             setError("Total custom card amount cannot exceed spendable balance.");
+//             return;
+//         }
+
 //         const id = await addCustomExpense(uid, { title, amount: amt, color });
-//         setCustomCards((prev) => [...prev, { id, title, amount: amt, color }]);
+//         const newCards = [...customCards, { id, title, amount: amt, color }];
+//         setCustomCards(newCards);
 //         setTitle("");
 //         setAmount("");
-//         // onTotalChange((prev) => prev + amt);
-//         onTotalChange(
-//             [...customCards, { id, title, amount: amt, color }].reduce((sum, c) => sum + c.amount, 0)
-//         );
-
+//         setError(null);
+//         onTotalChange(newCards.reduce((sum, c) => sum + c.amount, 0));
 //     };
 
 //     // 🔴 Delete card
@@ -161,39 +182,44 @@ export default function CustomCards({
 //         const uid = auth.currentUser?.uid;
 //         if (!uid || !id) return;
 //         await deleteCustomExpense(uid, id);
-//         setCustomCards((prev) => prev.filter((c) => c.id !== id));
+//         const newCards = customCards.filter((c) => c.id !== id);
+//         setCustomCards(newCards);
+//         onTotalChange(newCards.reduce((sum, c) => sum + c.amount, 0));
 //     };
 
 //     return (
-//         <div className="mt-6">
-//             <div className="flex items-center gap-3 mb-4 flex-wrap">
+//         <div className="col-span-1 md:col-span-4 mt-2">
+//             {/* Input Row */}
+//             <div className="flex items-center gap-3 mb-3 flex-wrap">
 //                 <input
 //                     type="text"
-//                     placeholder="Card title (e.g., Clothes)"
+//                     placeholder="Card title (e.g., Rent)"
 //                     value={title}
 //                     onChange={(e) => setTitle(e.target.value)}
-//                     className="border px-3 py-2 rounded-md"
+//                     className="border-2  border-slate-700 px-3 py-2 rounded-md bg-[#121212] text-white"
 //                 />
 //                 <input
 //                     type="number"
 //                     placeholder="Amount"
 //                     value={amount}
 //                     onChange={(e) => setAmount(e.target.value)}
-//                     className="border px-3 py-2 rounded-md w-28"
+//                     className="border-2  border-slate-700 px-3 py-2 rounded-md bg-[#121212] text-white w-28"
 //                 />
 //                 <button
 //                     onClick={handleAddCard}
-//                     className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+//                     className="bg-blue-800 text-white px-4 py-2 rounded-md hover:bg-blue-600"
 //                 >
 //                     Add
 //                 </button>
+//                 {error && <p className="text-red-400 text-sm">{error}</p>}
 //             </div>
 
+//             {/* Cards Grid */}
 //             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
 //                 {customCards.map((card) => (
 //                     <div
 //                         key={card.id}
-//                         className={`rounded-xl p-4 text-white bg-${card.color}-500 shadow-md relative`}
+//                         className={`rounded-xl p-4 text-white shadow-md relative border border-slate-800 bg-[#0f0f0f]`}
 //                     >
 //                         <button
 //                             onClick={() => handleDelete(card.id)}
@@ -201,7 +227,7 @@ export default function CustomCards({
 //                         >
 //                             ✕
 //                         </button>
-//                         <h3 className="text-lg font-semibold">{card.title}</h3>
+//                         <h3 className="text-lg font-semibold text-purple-400">{card.title}</h3>
 //                         <p className="text-2xl mt-2 font-bold">₹ {card.amount.toLocaleString()}</p>
 //                     </div>
 //                 ))}
@@ -210,80 +236,177 @@ export default function CustomCards({
 //     );
 // }
 
+// // "use client";
+// // import { useEffect, useState } from "react";
+// // import { auth } from "@/lib/firebase";
+// // import {
+// //     fetchCustomExpenses,
+// //     addCustomExpense,
+// //     deleteCustomExpense,
+// //     CustomExpense,
+// // } from "@/lib/firestore";
 
-// "use client";
+// // export default function CustomCards({ onTotalChange }: { onTotalChange: (total: number) => void }) {
+// //     const [customCards, setCustomCards] = useState<CustomExpense[]>([]);
+// //     const [title, setTitle] = useState("");
+// //     const [amount, setAmount] = useState<number | string>("");
+// //     const [color, setColor] = useState("purple");
 
-// import { useState } from "react";
+// //     // 🟢 Load user’s cards
+// //     useEffect(() => {
+// //         const uid = auth.currentUser?.uid;
+// //         if (!uid) return;
 
-// interface CustomCard {
-//     title: string;
-//     amount: number;
-//     color: string;
-// }
+// //         fetchCustomExpenses(uid).then((data) => {
+// //             setCustomCards(data);
+// //             onTotalChange(data.reduce((sum, c) => sum + c.amount, 0));
+// //         });
+// //     }, []);
 
-// export default function CustomCards({ onTotalChange }: { onTotalChange: (total: number) => void }) {
-//     const [customCards, setCustomCards] = useState<CustomCard[]>([]);
-//     const [title, setTitle] = useState("");
-//     const [amount, setAmount] = useState<number | string>("");
-//     const [color, setColor] = useState("purple");
+// //     // 🟡 Add card
+// //     const handleAddCard = async () => {
+// //         const uid = auth.currentUser?.uid;
+// //         if (!uid || !title || !amount) return;
+// //         const amt = Number(amount);
+// //         const id = await addCustomExpense(uid, { title, amount: amt, color });
+// //         setCustomCards((prev) => [...prev, { id, title, amount: amt, color }]);
+// //         setTitle("");
+// //         setAmount("");
+// //         // onTotalChange((prev) => prev + amt);
+// //         onTotalChange(
+// //             [...customCards, { id, title, amount: amt, color }].reduce((sum, c) => sum + c.amount, 0)
+// //         );
 
-//     const handleAddCard = () => {
-//         if (!title || !amount) return;
-//         const amt = Number(amount);
-//         const newCard = { title, amount: amt, color };
-//         const updatedCards = [...customCards, newCard];
-//         setCustomCards(updatedCards);
-//         setTitle("");
-//         setAmount("");
-//         onTotalChange(updatedCards.reduce((sum, c) => sum + c.amount, 0));
-//     };
+// //     };
 
-//     return (
-//         <div className="mt-4">
-//             <div className="flex items-center gap-3 mb-3">
-//                 <input
-//                     type="text"
-//                     placeholder="Card title (e.g., Clothes)"
-//                     value={title}
-//                     onChange={(e) => setTitle(e.target.value)}
-//                     className="border px-3 py-2 rounded-md"
-//                 />
-//                 <input
-//                     type="number"
-//                     placeholder="Amount"
-//                     value={amount}
-//                     onChange={(e) => setAmount(e.target.value)}
-//                     className="border px-3 py-2 rounded-md w-28"
-//                 />
-//                 <select
-//                     value={color}
-//                     onChange={(e) => setColor(e.target.value)}
-//                     className="border px-2 py-2 rounded-md"
-//                 >
-//                     <option value="purple">Purple</option>
-//                     <option value="pink">Pink</option>
-//                     <option value="teal">Teal</option>
-//                     <option value="red">Red</option>
-//                 </select>
-//                 <button
-//                     onClick={handleAddCard}
-//                     className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-//                 >
-//                     Add Card
-//                 </button>
-//             </div>
+// //     // 🔴 Delete card
+// //     const handleDelete = async (id?: string) => {
+// //         const uid = auth.currentUser?.uid;
+// //         if (!uid || !id) return;
+// //         await deleteCustomExpense(uid, id);
+// //         setCustomCards((prev) => prev.filter((c) => c.id !== id));
+// //     };
 
-//             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-//                 {customCards.map((card, i) => (
-//                     <div
-//                         key={i}
-//                         className={`rounded-xl p-4 text-black bg-${card.color}-500 shadow-md`}
-//                     >
-//                         <h3 className="text-lg font-semibold">{card.title}</h3>
-//                         <p className="text-2xl mt-2 font-bold">₹ {card.amount.toLocaleString()}</p>
-//                     </div>
-//                 ))}
-//             </div>
-//         </div>
-//     );
-// }
+// //     return (
+// //         <div className="mt-6">
+// //             <div className="flex items-center gap-3 mb-4 flex-wrap">
+// //                 <input
+// //                     type="text"
+// //                     placeholder="Card title (e.g., Clothes)"
+// //                     value={title}
+// //                     onChange={(e) => setTitle(e.target.value)}
+// //                     className="border px-3 py-2 rounded-md"
+// //                 />
+// //                 <input
+// //                     type="number"
+// //                     placeholder="Amount"
+// //                     value={amount}
+// //                     onChange={(e) => setAmount(e.target.value)}
+// //                     className="border px-3 py-2 rounded-md w-28"
+// //                 />
+// //                 <button
+// //                     onClick={handleAddCard}
+// //                     className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+// //                 >
+// //                     Add
+// //                 </button>
+// //             </div>
+
+// //             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+// //                 {customCards.map((card) => (
+// //                     <div
+// //                         key={card.id}
+// //                         className={`rounded-xl p-4 text-white bg-${card.color}-500 shadow-md relative`}
+// //                     >
+// //                         <button
+// //                             onClick={() => handleDelete(card.id)}
+// //                             className="absolute top-2 right-2 bg-white text-black rounded-full px-2 py-1 text-xs hover:bg-gray-200"
+// //                         >
+// //                             ✕
+// //                         </button>
+// //                         <h3 className="text-lg font-semibold">{card.title}</h3>
+// //                         <p className="text-2xl mt-2 font-bold">₹ {card.amount.toLocaleString()}</p>
+// //                     </div>
+// //                 ))}
+// //             </div>
+// //         </div>
+// //     );
+// // }
+
+
+// // "use client";
+
+// // import { useState } from "react";
+
+// // interface CustomCard {
+// //     title: string;
+// //     amount: number;
+// //     color: string;
+// // }
+
+// // export default function CustomCards({ onTotalChange }: { onTotalChange: (total: number) => void }) {
+// //     const [customCards, setCustomCards] = useState<CustomCard[]>([]);
+// //     const [title, setTitle] = useState("");
+// //     const [amount, setAmount] = useState<number | string>("");
+// //     const [color, setColor] = useState("purple");
+
+// //     const handleAddCard = () => {
+// //         if (!title || !amount) return;
+// //         const amt = Number(amount);
+// //         const newCard = { title, amount: amt, color };
+// //         const updatedCards = [...customCards, newCard];
+// //         setCustomCards(updatedCards);
+// //         setTitle("");
+// //         setAmount("");
+// //         onTotalChange(updatedCards.reduce((sum, c) => sum + c.amount, 0));
+// //     };
+
+// //     return (
+// //         <div className="mt-4">
+// //             <div className="flex items-center gap-3 mb-3">
+// //                 <input
+// //                     type="text"
+// //                     placeholder="Card title (e.g., Clothes)"
+// //                     value={title}
+// //                     onChange={(e) => setTitle(e.target.value)}
+// //                     className="border px-3 py-2 rounded-md"
+// //                 />
+// //                 <input
+// //                     type="number"
+// //                     placeholder="Amount"
+// //                     value={amount}
+// //                     onChange={(e) => setAmount(e.target.value)}
+// //                     className="border px-3 py-2 rounded-md w-28"
+// //                 />
+// //                 <select
+// //                     value={color}
+// //                     onChange={(e) => setColor(e.target.value)}
+// //                     className="border px-2 py-2 rounded-md"
+// //                 >
+// //                     <option value="purple">Purple</option>
+// //                     <option value="pink">Pink</option>
+// //                     <option value="teal">Teal</option>
+// //                     <option value="red">Red</option>
+// //                 </select>
+// //                 <button
+// //                     onClick={handleAddCard}
+// //                     className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+// //                 >
+// //                     Add Card
+// //                 </button>
+// //             </div>
+
+// //             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+// //                 {customCards.map((card, i) => (
+// //                     <div
+// //                         key={i}
+// //                         className={`rounded-xl p-4 text-black bg-${card.color}-500 shadow-md`}
+// //                     >
+// //                         <h3 className="text-lg font-semibold">{card.title}</h3>
+// //                         <p className="text-2xl mt-2 font-bold">₹ {card.amount.toLocaleString()}</p>
+// //                     </div>
+// //                 ))}
+// //             </div>
+// //         </div>
+// //     );
+// // }
