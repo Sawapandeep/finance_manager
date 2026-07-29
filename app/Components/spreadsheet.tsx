@@ -49,7 +49,7 @@ export default function Spreadsheet({
       amount: undefined as unknown as number,
       inOut: 'GO',
       type: '',
-      savings: undefined as unknown as number,
+      savings: 0,
     };
     setRows([...rows, newRow]);
     setEditingId(newRow.id);
@@ -208,9 +208,10 @@ export default function Spreadsheet({
                     <input
                       type="number"
                       value={row.amount ?? ''}
-                      onChange={(e) =>
-                        updateRow(row.id, { amount: e.target.value ? Number(e.target.value) : undefined })
-                      }
+                      onChange={(e) => updateRow(row.id, { savings: Number(e.target.value) || 0 })}
+                      // onChange={(e) =>
+                      //   updateRow(row.id, { amount: e.target.value ? Number(e.target.value) : undefined })
+                      // }
                       placeholder="Amount"
                       className="font-mono-nums text-sm rounded-lg px-3 py-2"
                       style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
