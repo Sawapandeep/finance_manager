@@ -40,11 +40,19 @@ export default function Spreadsheet({
       now.getDate()
     ).padStart(2, '0')}`;
   }
-
+  function generateTempId() {
+    const now = new Date();
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const stamp =
+      `${pad(now.getDate())}${pad(now.getMonth() + 1)}${now.getFullYear()}` +
+      `${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+    const rand = Math.random().toString(36).slice(2, 8);
+    return `temp-${stamp}-${rand}`;
+  }
   function addEmptyRow() {
     if (!uid) return;
     const newRow: Transaction = {
-      id: `temp-${Date.now()}`,
+      id: generateTempId(),
       date: getLocalDateString(),
       amount: undefined as unknown as number,
       inOut: 'GO',
@@ -205,17 +213,16 @@ export default function Spreadsheet({
                     style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
                   />
                   <div className="grid grid-cols-2 gap-2">
-                    <input
-                      type="number"
-                      value={row.amount ?? ''}
-                      onChange={(e) => updateRow(row.id, { savings: Number(e.target.value) || 0 })}
-                      // onChange={(e) =>
-                      //   updateRow(row.id, { amount: e.target.value ? Number(e.target.value) : undefined })
-                      // }
-                      placeholder="Amount"
-                      className="font-mono-nums text-sm rounded-lg px-3 py-2"
-                      style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
-                    />
+                  <input
+  type="number"
+  value={row.amount ?? ''}
+  onChange={(e) =>
+    updateRow(row.id, { amount: e.target.value ? Number(e.target.value) : undefined })
+  }
+  placeholder="Amount"
+  className="font-mono-nums text-sm rounded-lg px-3 py-2"
+  style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
+/>
                     <input
                       type="number"
                       value={row.savings ?? ''}
