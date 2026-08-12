@@ -15,7 +15,8 @@ export default function CustomCards({
   const [customCards, setCustomCards] = useState<CustomExpense[]>([]);
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState<number | string>("");
-  const [error, setError] = useState<string | null>(null);
+  // const [error, setError] = useState<string | null>(null);
+  
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -27,21 +28,32 @@ export default function CustomCards({
     });
   }, []);
 
+  // const handleAddCard = async () => {
+  //   const uid = auth.currentUser?.uid;
+  //   if (!uid || !title || !amount) return;
+  //   const amt = Number(amount);
+  //   const totalWithNew = customCards.reduce((sum, c) => sum + c.amount, 0) + amt;
+  //   if (totalWithNew > spendable) {
+  //     setError("That would exceed what's spendable.");
+  //     return;
+  //   }
+  //   const id = await addCustomExpense(uid, { title, amount: amt });
+  //   const newCards = [...customCards, { id, title, amount: amt }];
+  //   setCustomCards(newCards);
+  //   setTitle("");
+  //   setAmount("");
+  //   setError(null);
+  //   onTotalChange(newCards.reduce((sum, c) => sum + c.amount, 0));
+  // };
   const handleAddCard = async () => {
     const uid = auth.currentUser?.uid;
     if (!uid || !title || !amount) return;
     const amt = Number(amount);
-    const totalWithNew = customCards.reduce((sum, c) => sum + c.amount, 0) + amt;
-    if (totalWithNew > spendable) {
-      setError("That would exceed what's spendable.");
-      return;
-    }
     const id = await addCustomExpense(uid, { title, amount: amt });
     const newCards = [...customCards, { id, title, amount: amt }];
     setCustomCards(newCards);
     setTitle("");
     setAmount("");
-    setError(null);
     onTotalChange(newCards.reduce((sum, c) => sum + c.amount, 0));
   };
 
@@ -93,7 +105,7 @@ export default function CustomCards({
               Add
             </button>
           </div>
-          {error && <p className="text-xs" style={{ color: 'var(--debit)' }}>{error}</p>}
+          {/* {error && <p className="text-xs" style={{ color: 'var(--debit)' }}>{error}</p>} */}
 
           {customCards.length > 0 && (
             <div className="grid grid-cols-2 gap-2">

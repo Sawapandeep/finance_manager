@@ -78,7 +78,8 @@ export default function DashboardPage() {
   }, 0);
 
   const spendable = total - totalSavings;
-  const spendableAfterCustom = Math.max(spendable - customTotal, 0);
+  // const spendableAfterCustom = Math.max(spendable - customTotal, 0);
+  const spendableAfterCustom = spendable - customTotal;
 
   return (
     <AuthGate>
@@ -99,7 +100,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Hero balance */}
-        <div
+        {/* <div
           className="rounded-2xl p-6"
           style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
         >
@@ -107,8 +108,19 @@ export default function DashboardPage() {
           <p className="font-mono-nums text-4xl sm:text-5xl font-medium">
             ₹{total.toLocaleString()}
           </p>
-        </div>
-
+        </div> */}
+<div
+  className="rounded-2xl p-6"
+  style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+>
+  <p className="text-xs mb-2" style={{ color: 'var(--text-muted)' }}>Net total</p>
+  <p
+    className="font-mono-nums text-4xl sm:text-5xl font-medium"
+    style={{ color: total < 0 ? 'var(--debit)' : 'var(--text)' }}
+  >
+    {total < 0 ? '−' : ''}₹{Math.abs(total).toLocaleString()}
+  </p>
+</div>
         {/* Stat row */}
         <div className="grid grid-cols-2 gap-3">
           <StatCard label="Savings" value={totalSavings} color="var(--savings)" />
@@ -126,20 +138,37 @@ export default function DashboardPage() {
     </AuthGate>
   );
 }
-
 function StatCard({ label, value, color }: { label: string; value: number; color: string }) {
+  const isNegative = value < 0;
   return (
     <div
       className="rounded-2xl p-4"
       style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
     >
       <p className="text-xs mb-1" style={{ color: 'var(--text-muted)' }}>{label}</p>
-      <p className="font-mono-nums text-xl font-medium" style={{ color }}>
-        ₹{value.toLocaleString()}
+      <p
+        className="font-mono-nums text-xl font-medium"
+        style={{ color: isNegative ? 'var(--debit)' : color }}
+      >
+        {isNegative ? '−' : ''}₹{Math.abs(value).toLocaleString()}
       </p>
     </div>
   );
 }
+
+// function StatCard({ label, value, color }: { label: string; value: number; color: string }) {
+//   return (
+//     <div
+//       className="rounded-2xl p-4"
+//       style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+//     >
+//       <p className="text-xs mb-1" style={{ color: 'var(--text-muted)' }}>{label}</p>
+//       <p className="font-mono-nums text-xl font-medium" style={{ color }}>
+//         ₹{value.toLocaleString()}
+//       </p>
+//     </div>
+//   );
+// }
 
 // //! app/dashboard/page.tsx
 // 'use client';
